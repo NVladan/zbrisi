@@ -1,0 +1,29 @@
+zbriši — Proprietary Software License
+Copyright (c) 2026 Vladan Nikolić. All rights reserved.
+
+This software, including its source code, design, content, and all files in this
+repository (collectively, the "Software"), is the proprietary and confidential
+property of the copyright holder.
+
+NO LICENSE IS GRANTED. No permission is given, whether express or implied, to any
+person or entity to use, copy, reproduce, modify, adapt, translate, merge,
+publish, distribute, sublicense, host, deploy, create derivative works from, or
+sell the Software or any part of it, by any means and in any form, without the
+prior written permission of the copyright holder.
+
+Being able to view the Software (for example, because it is hosted on a public
+code-hosting platform) does NOT grant any right or license to use it. All rights
+not expressly granted in writing are reserved.
+
+To request permission for any use, contact me via GitHub: https://github.com/NVladan
+
+Third-party components (e.g. open-source libraries listed in requirements.txt and
+bundled fonts) remain governed by their own respective licenses; this license
+applies only to the original work of the copyright holder.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE COPYRIGHT
+HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.

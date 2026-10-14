@@ -1,0 +1,237 @@
+{% extends "base.html" %}
+{% block meta_title %}{{ brand }} — {{ t('footer.tagline') }}{% endblock %}
+{% block meta_desc %}{{ t('home.meta_desc') }}{% endblock %}
+
+{% block content %}
+<section class="hero" id="search">
+    <div class="hero-sun"></div>
+    <div class="hero-rings">
+        <span style="width:440px;height:440px"></span>
+        <span style="width:600px;height:600px"></span>
+        <span style="width:780px;height:780px"></span>
+    </div>
+    <svg class="hero-path" viewBox="0 0 1200 500" preserveAspectRatio="none" fill="none">
+        <path d="M-50,400 C300,260 520,360 760,180 C920,60 1080,120 1260,40" stroke="rgba(251,238,222,0.6)" stroke-width="1.5"/>
+    </svg>
+
+    <div class="wrap hero-inner">
+        <p class="eyebrow reveal d1">{{ t('hero.eyebrow') }}</p>
+        <h1 class="reveal d2">{{ t('hero.title')|safe }}</h1>
+        <p class="hero-sub reveal d3">{{ t('hero.sub') }}</p>
+        <div class="hero-stats reveal d4">
+            <div class="stat"><div class="n">300+</div><div class="l">{{ t('hero.stat1_l') }}</div></div>
+            <div class="stat"><div class="n">€20</div><div class="l">{{ t('hero.stat2_l') }}</div></div>
+            <div class="stat"><div class="n">0</div><div class="l">{{ t('hero.stat3_l') }}</div></div>
+        </div>
+    </div>
+</section>
+
+<div class="wrap search-shell reveal d4">
+    <form class="search-card" action="{{ url_for('search') }}" method="POST" id="searchForm" autocomplete="off">
+        <div class="search-head">
+            <span class="tag">{{ t('search.tag') }}</span>
+            <div class="head-controls">
+                <div class="trip-pills" role="group" aria-label="Trip type" id="tripPills">
+                    <button type="button" class="trip-pill" data-trip="oneway" aria-pressed="true">{{ t('search.oneway') }}</button>
+                    <button type="button" class="trip-pill" data-trip="roundtrip" aria-pressed="false">{{ t('search.roundtrip') }}</button>
+                </div>
+
+                <div class="pax-picker" id="paxPicker">
+                    <button type="button" class="pax-btn" id="paxBtn" aria-haspopup="true" aria-expanded="false">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        <span id="paxLabel" data-one="{{ t('pax.one') }}" data-many="{{ t('pax.many') }}">1 {{ t('pax.one') }}</span>
+                        <svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                    </button>
+                    <div class="pax-panel" id="paxPanel" hidden>
+                        {% for row, lo in [('adults', 1), ('children', 0), ('infants', 0)] %}
+                        <div class="pax-row">
+                            <div class="pax-info">
+                                <span class="pax-name">{{ t('pax.' ~ row) }}</span>
+                                <span class="pax-sub">{{ t('pax.' ~ row ~ '_sub') }}</span>
+                            </div>
+                            <div class="pax-step">
+                                <button type="button" class="pax-step-btn" data-pax="{{ row }}" data-dir="-1" aria-label="−">−</button>
+                                <span class="pax-count" data-count="{{ row }}">{{ lo }}</span>
+                                <button type="button" class="pax-step-btn" data-pax="{{ row }}" data-dir="1" aria-label="+">+</button>
+                            </div>
+                        </div>
+                        {% endfor %}
+                        <button type="button" class="pax-done" id="paxDone">{{ t('pax.done') }}</button>
+                    </div>
+                    <input type="hidden" name="adults" id="adultsInput" value="1">
+                    <input type="hidden" name="children" id="childrenInput" value="0">
+                    <input type="hidden" name="infants" id="infantsInput" value="0">
+                </div>
+
+                <label class="cur-select">
+                    <span class="sr-only">Currency</span>
+                    <select name="currency" id="currencyInput" aria-label="Currency">
+                        {% for code, label in currencies %}
+                        <option value="{{ code }}" {{ 'selected' if code == default_currency else '' }}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </label>
+            </div>
+        </div>
+
+        <div class="flight-form" id="flightForm">
+            <div class="field" data-ac>
+                <label for="departure_location">{{ t('search.from_label') }}</label>
+                <div class="field-row">
+                    <svg class="pin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17H3a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1h2"/><path d="m5 8 4-5h2l-1 5"/><path d="M22 12.5a2 2 0 0 0-2-2.5L4 11l5 4 11-.5a2 2 0 0 0 2-2Z"/></svg>
+                    <input type="text" id="departure_location" name="departure_location" required placeholder="{{ t('search.from_ph') }}" data-ac-input>
+                </div>
+                <small>{{ t('search.from_help') }}</small>
+            </div>
+
+            <div class="field" data-ac>
+                <label for="destination_location">{{ t('search.to_label') }}</label>
+                <div class="field-row">
+                    <svg class="pin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                    <input type="text" id="destination_location" name="destination_location" placeholder="{{ t('search.to_ph') }}" data-ac-input>
+                </div>
+                <button type="button" class="anywhere-btn" id="anywhereBtn">{{ t('search.anywhere') }}</button>
+            </div>
+
+            <div class="field">
+                <label for="approx_date">{{ t('search.around_label') }}</label>
+                <div class="field-row">
+                    <svg class="pin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                    <input type="date" id="approx_date" name="approx_date" required value="{{ default_date }}" min="{{ today }}" aria-label="{{ t('search.around_label') }}">
+                </div>
+                <small>{{ t('search.around_help') }}</small>
+            </div>
+
+            <div class="field field-return" id="returnField">
+                <label for="return_date">{{ t('search.return_label') }} <span class="opt-tag mono">{{ t('search.optional') }}</span></label>
+                <div class="field-row">
+                    <svg class="pin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                    <input type="date" id="return_date" name="return_date" min="{{ today }}" aria-label="{{ t('search.return_label') }}">
+                </div>
+                <small id="returnHint" class="return-hint is-suggest"
+                       data-suggest="{{ t('search.return_suggest') }}"
+                       data-near="{{ t('search.return_near') }}">{{ t('search.return_suggest') }}</small>
+            </div>
+
+            <input type="hidden" name="trip_type" id="tripType" value="oneway">
+
+            <div class="search-submit">
+                <button type="submit" class="btn">
+                    <svg class="btn-plane" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg>
+                    {{ t('search.submit') }}
+                </button>
+            </div>
+        </div>
+
+        <div class="search-extra">
+            <span class="extra-label mono">{{ t('flex.label') }}</span>
+            <div class="flex-seg" role="group" aria-label="{{ t('flex.label') }}">
+                <button type="button" class="flex-opt" data-flex="0" aria-pressed="true">{{ t('flex.month') }}</button>
+                <button type="button" class="flex-opt" data-flex="3" aria-pressed="false">{{ t('flex.d3') }}</button>
+                <button type="button" class="flex-opt" data-flex="7" aria-pressed="false">{{ t('flex.d7') }}</button>
+            </div>
+            <input type="hidden" name="flex" id="flexInput" value="0">
+        </div>
+    </form>
+
+    <div class="trust-strip reveal d4">
+        <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> {{ t('trust.1') }}</span>
+        <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> {{ t('trust.2') }}</span>
+        <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> {{ t('trust.3') }}</span>
+    </div>
+
+    <div class="recent" id="recentSearches" hidden
+         data-search-url="{{ url_for('search') }}" data-anywhere="{{ t('recent.anywhere') }}">
+        <div class="recent-head">
+            <span class="recent-label">{{ t('recent.title') }}</span>
+            <button type="button" class="recent-clear" id="recentClear">{{ t('recent.clear') }}</button>
+        </div>
+        <div class="recent-chips" id="recentChips"></div>
+    </div>
+</div>
+
+<section class="wrap bx-promo-wrap reveal d4" id="deals">
+    <div class="bx-promo">
+        <div class="bx-promo-glow" aria-hidden="true"></div>
+        <div class="bx-promo-copy">
+            <p class="eyebrow">{{ t('deals.eyebrow') }}</p>
+            <h2>{{ t('deals.title') }}</h2>
+            <p>{{ t('deals.sub') }}</p>
+        </div>
+        <form class="bx-promo-form" action="{{ url_for('anywhere') }}" method="GET" autocomplete="off">
+            <div class="bx-field" data-ac>
+                <label for="promoFrom">{{ t('anywhere.from_label') }}</label>
+                <div class="bx-row">
+                    <svg class="pin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17H3a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1h2"/><path d="m5 8 4-5h2l-1 5"/><path d="M22 12.5a2 2 0 0 0-2-2.5L4 11l5 4 11-.5a2 2 0 0 0 2-2Z"/></svg>
+                    <input type="text" id="promoFrom" name="from" data-ac-input placeholder="{{ t('search.from_ph') }}">
+                </div>
+            </div>
+            <div class="bx-field bx-field-budget">
+                <label for="promoBudget">{{ t('anywhere.budget_label') }}</label>
+                <div class="bx-row">
+                    <span class="bx-cur mono">{{ default_cur_symbol }}</span>
+                    <input type="number" id="promoBudget" name="budget" min="1" step="1" inputmode="numeric" placeholder="{{ t('anywhere.budget_ph') }}">
+                </div>
+            </div>
+            <button type="submit" class="btn bx-promo-cta">
+                {{ t('deals.cta') }}
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </button>
+        </form>
+    </div>
+</section>
+
+<section class="wrap map-promo-wrap">
+    <a class="map-promo" href="{{ url_for('map_page') }}">
+        <span class="map-promo-glow" aria-hidden="true"></span>
+        <span class="map-promo-copy">
+            <span class="eyebrow">{{ t('map.eyebrow') }} <span style="color:var(--gold-soft)">✦</span></span>
+            <span class="map-promo-title">{{ t('map.h1') }}</span>
+            <span class="map-promo-sub">{{ t('map.intro') }}</span>
+            <span class="btn map-promo-cta">{{ t('map.poster_cta') }}
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </span>
+        </span>
+        <span class="map-promo-art" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        </span>
+    </a>
+</section>
+
+<section class="block wrap" id="explore">
+    <div class="section-head">
+        <p class="eyebrow">{{ t('explore.eyebrow') }}</p>
+        <h2>{{ t('explore.title') }}</h2>
+        <p>{{ t('explore.sub') }}</p>
+    </div>
+    <div class="dest-grid">
+        {% for d in popular %}
+        <button type="button" class="dest-card{{ ' has-photo' if d.img != 'none' else '' }}" style="--g: {{ d.g }}; --bg-image: {{ d.img }}" data-code="{{ d.code }}" data-label="{{ d.city }} ({{ d.code }})">
+            <span class="go"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg></span>
+            <span class="code mono">{{ d.code }}</span>
+            <span class="city">{{ d.city }}</span>
+            <span class="country">{{ d.country }}</span>
+        </button>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="block wrap" id="how">
+    <div class="section-head">
+        <p class="eyebrow">{{ t('how.eyebrow') }}</p>
+        <h2>{{ t('how.title') }}</h2>
+    </div>
+    <div class="how-grid">
+        <div class="how-step"><div class="num">1</div><h3>{{ t('how.s1_t') }}</h3><p>{{ t('how.s1_b') }}</p></div>
+        <div class="how-step"><div class="num">2</div><h3>{{ t('how.s2_t') }}</h3><p>{{ t('how.s2_b') }}</p></div>
+        <div class="how-step"><div class="num">3</div><h3>{{ t('how.s3_t') }}</h3><p>{{ t('how.s3_b') }}</p></div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<!-- Date pickers: consistent dd-Mon-yyyy display for every visitor (native
+     <input type=date> renders per-browser-locale). app.js enhances the fields. -->
+<link href="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.js"></script>
+{% endblock %}

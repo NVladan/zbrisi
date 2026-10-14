@@ -1,0 +1,3 @@
+-r requirements.txt
+pytest>=8.0
+# Pillow is in requirements.txt (runtime city-photo fetch + scripts/make_og.py).

@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block meta_title %}{{ t('city.meta_title', city=decl(code,'gen')) }}{% endblock %}
+{% block meta_desc %}{{ t('city.meta_desc', city=decl(code,'gen')) }}{% endblock %}
+
+{% block content %}
+<main class="wrap hub-page">
+    <nav class="crumbs">
+        <a href="{{ url_for('index') }}">{{ t('common.home') }}</a> <span>/</span>
+        <a href="{{ url_for('flights_hub') }}">{{ t('nav.flights') }}</a> <span>/</span>
+        <span>{{ city_name }}</span>
+    </nav>
+
+    <header class="section-head">
+        <p class="eyebrow">{{ code }} <span style="color:var(--coral)">✈</span></p>
+        <h1>{{ t('city.h1', city=decl(code,'gen')) }}</h1>
+        <p>{{ t('city.intro', city=decl(code,'gen'), code=code) }}</p>
+    </header>
+
+    <div class="city-dest-grid">
+        {% for r in rows %}
+        <a class="city-dest" href="{{ url_for('route_page', frm=code, to=r.code) }}">
+            <span class="cd-main">
+                <span class="cd-city">{{ city_name }} <span class="cd-arrow">→</span> {{ r.city }}</span>
+                <span class="cd-country">{{ r.country }} <span class="mono">{{ r.code }}</span></span>
+            </span>
+            <span class="cd-price">
+                {% if r.price %}<span class="cd-from">{{ t('res.from') }}</span> <span class="mono cd-num">{{ r.price }} {{ currency|upper }}</span>
+                {% else %}<span class="cd-see">{{ t('city.see_prices') }}</span>{% endif %}
+            </span>
+        </a>
+        {% endfor %}
+    </div>
+</main>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {"@type": "ListItem", "position": 1, "name": {{ t('common.home')|tojson }}, "item": {{ url_for('index', _external=True)|tojson }}},
+    {"@type": "ListItem", "position": 2, "name": {{ t('nav.flights')|tojson }}, "item": {{ url_for('flights_hub', _external=True)|tojson }}},
+    {"@type": "ListItem", "position": 3, "name": {{ city_name|tojson }}, "item": {{ request.base_url|tojson }}}
+  ]
+}
+</script>
+{% endblock %}

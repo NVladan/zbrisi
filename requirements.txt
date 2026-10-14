@@ -1,0 +1,9 @@
+Flask>=3.1.0
+requests>=2.32.0
+python-dotenv>=1.0.0
+markdown>=3.5
+Pillow>=10.0     # on-demand city-photo fetch (city_photos.py) + scripts
+# Production WSGI servers: gunicorn on the Linux VPS, waitress for local
+# Windows / cross-platform. Never run the Flask dev server in production.
+gunicorn>=21.2.0 ; sys_platform != "win32"
+waitress>=3.0.0

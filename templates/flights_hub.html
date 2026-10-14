@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block meta_title %}{{ t('hub.meta_title') }}{% endblock %}
+{% block meta_desc %}{{ t('hub.meta_desc') }}{% endblock %}
+
+{% block content %}
+<main class="wrap hub-page">
+    <nav class="crumbs">
+        <a href="{{ url_for('index') }}">{{ t('common.home') }}</a> <span>/</span>
+        <span>{{ t('nav.flights') }}</span>
+    </nav>
+
+    <header class="section-head">
+        <p class="eyebrow">{{ t('nav.flights') }}</p>
+        <h1>{{ t('hub.h1') }}</h1>
+        <p>{{ t('hub.intro') }}</p>
+    </header>
+
+    <div class="hub-grid">
+        {% for s in sections %}
+        <section class="hub-origin">
+            <h2>{{ t('hub.from', city=decl(s.code,'gen')) }} <span class="mono">{{ s.code }}</span></h2>
+            <p class="hub-country">{{ s.country }}</p>
+            <ul class="link-cloud">
+                {% for r in s.routes %}
+                <li><a href="{{ url_for('route_page', frm=s.code, to=r.code) }}">{{ s.city }} → {{ r.city }} <span class="mono">{{ r.code }}</span></a></li>
+                {% endfor %}
+            </ul>
+        </section>
+        {% endfor %}
+    </div>
+</main>
+{% endblock %}

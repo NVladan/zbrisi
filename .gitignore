@@ -1,0 +1,39 @@
+# Secrets - never commit your real token/marker
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# Virtual environment
+.venv/
+venv/
+
+# IDE
+.idea/
+.vscode/
+
+# Claude Code local (per-machine) settings
+.claude/settings.local.json
+
+# Map build cache — intermediate per-origin "anywhere" API results, regenerated
+# by scripts/build_map_connectivity.py. The aggregated outputs it writes to
+# static/map/ (connectivity.json, routes/, regions.geojson) ARE committed.
+data/_map_cache/
+
+# Mapa/ — the local region-editor tool + its raw Natural Earth geojson and ~50
+# backups (~680 MB). Not needed to run the site (which uses the derived, small
+# static/map/regions.geojson). Keep it out of git history.
+Mapa/
+
+# Half-written on-demand city photos (atomic write leaves these only on a crash)
+static/img/cities/*.tmp
+
+# Windows reserved device names can't be git-tracked on Windows (PRN = Pristina).
+# The Linux server creates/serves these fine via on-demand fetch or FileZilla.
+static/img/cities/PRN.jpg
+static/img/cities/CON.jpg
+static/img/cities/AUX.jpg
+static/img/cities/NUL.jpg

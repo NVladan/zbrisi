@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block meta_title %}{{ t('guides.meta_title') }}{% endblock %}
+{% block meta_desc %}{{ t('guides.meta_desc') }}{% endblock %}
+
+{% block content %}
+<main class="wrap guides-page">
+    <nav class="crumbs">
+        <a href="{{ url_for('index') }}">{{ t('common.home') }}</a> <span>/</span>
+        <span>{{ t('guides.h1') }}</span>
+    </nav>
+
+    <header class="section-head">
+        <p class="eyebrow">{{ t('guides.eyebrow') }} <span style="color:var(--coral)">✦</span></p>
+        <h1>{{ t('guides.h1') }}</h1>
+        <p>{{ t('guides.intro') }}</p>
+    </header>
+
+    {% if guides %}
+    <div class="guide-list">
+        {% for gd in guides %}
+        <a class="guide-card" href="{{ url_for('guide', slug=gd.slug) }}">
+            <span class="guide-date mono">{{ gd.date }}</span>
+            <h2>{{ gd.title }}</h2>
+            <p>{{ gd.description }}</p>
+            <span class="guide-read">{{ t('guides.read') }} →</span>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="guides-empty">{{ t('guides.empty') }}</p>
+    {% endif %}
+</main>
+{% endblock %}

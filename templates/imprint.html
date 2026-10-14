@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block meta_title %}{{ t('imprint.meta_title') }}{% endblock %}
+{% block meta_desc %}{{ t('imprint.intro') }}{% endblock %}
+
+{% block content %}
+<main class="wrap legal-page">
+    <nav class="crumbs">
+        <a href="{{ url_for('index') }}">{{ t('common.home') }}</a> <span>/</span>
+        <span>{{ t('imprint.h1') }}</span>
+    </nav>
+
+    <header class="section-head">
+        <h1>{{ t('imprint.h1') }}</h1>
+        <p>{{ t('imprint.intro') }}</p>
+    </header>
+
+    <div class="legal-body">
+        <section>
+            <h2>{{ t('imprint.operator_t') }}</h2>
+            <p>
+                <strong>{{ operator.name }}</strong><br>
+                {% if operator.address %}{{ operator.address }}<br>{% endif %}
+                {{ operator.country }}
+            </p>
+        </section>
+        <section>
+            <h2>{{ t('imprint.contact_t') }}</h2>
+            <p>{{ t('imprint.contact_b') }} <a href="mailto:{{ contact_email }}">{{ contact_email }}</a></p>
+        </section>
+        <section>
+            <h2>{{ t('imprint.responsibility_t') }}</h2>
+            <p>{{ t('imprint.responsibility_b') }}</p>
+        </section>
+        <section>
+            <h2>{{ t('imprint.disclaimer_t') }}</h2>
+            <p>{{ t('imprint.disclaimer_b') }}</p>
+        </section>
+    </div>
+</main>
+{% endblock %}

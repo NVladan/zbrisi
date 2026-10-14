@@ -1,0 +1,27 @@
+# systemd unit that keeps the gunicorn app running and restarts it on crash/boot.
+# Install:  sudo cp deploy/zbrisi.service /etc/systemd/system/zbrisi.service
+#           sudo systemctl daemon-reload
+#           sudo systemctl enable --now zbrisi
+#           sudo systemctl status zbrisi          # check it's running
+# Logs:     journalctl -u zbrisi -f
+#
+# Runs as user "vladan" from /home/vladan/zbrisi. Adjust if yours differ.
+
+[Unit]
+Description=zbrisi Flask app (gunicorn)
+After=network.target
+
+[Service]
+User=vladan
+Group=vladan
+WorkingDirectory=/home/vladan/zbrisi
+# app.py also calls load_dotenv(), so the .env in WorkingDirectory is read too;
+# EnvironmentFile here is belt-and-suspenders and makes the vars explicit.
+EnvironmentFile=/home/vladan/zbrisi/.env
+ExecStart=/home/vladan/zbrisi/.venv/bin/gunicorn app:app \
+    --workers 2 --timeout 60 --bind 127.0.0.1:8000
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

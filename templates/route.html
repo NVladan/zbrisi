@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+{% block meta_title %}{{ t('route.meta_title', frm=decl(frm,'gen'), to=decl(to,'acc')) }}{% endblock %}
+{% block meta_desc %}{{ t('route.meta_desc', frm=decl(frm,'gen'), to=decl(to,'acc')) }}{% endblock %}
+
+{% block content %}
+{% set frm_g = decl(frm, 'gen') %}
+{% set to_a = decl(to, 'acc') %}
+{% set q1 = t('route.faq_q1', frm=frm_g, to=to_a) %}
+{% set a1 = t('route.faq_a1', frm=frm_g, to=to_a, price=cheapest_price) if cheapest_price else t('route.faq_a1_alt', frm=frm_g, to=to_a) %}
+{% set q2 = t('route.faq_q2', frm=frm_name, to=to_name) %}
+{% set a2 = t('route.faq_a2', frm=frm_name, to=to_name) %}
+{% set q3 = t('route.faq_q3', frm=frm_name, to=to_a) %}
+{% set a3 = t('route.faq_a3', frm=frm_name, to=to_name) %}
+{% set search_url = url_for('search', departure_location=frm, destination_location=to, approx_date=default_date) %}
+
+<main class="wrap route-page">
+    <nav class="crumbs">
+        <a href="{{ url_for('index') }}">{{ t('common.home') }}</a> <span>/</span>
+        <a href="{{ url_for('flights_hub') }}">{{ t('nav.flights') }}</a> <span>/</span>
+        <span>{{ frm_name }} → {{ to_name }}</span>
+    </nav>
+
+    <header class="route-hero">
+        <p class="eyebrow">{{ frm }} <span class="arrow">✈</span> {{ to }}</p>
+        <h1>{{ t('route.h1', frm=frm_g, to=to_a) }}</h1>
+        <p class="route-intro">{{ t('route.intro', frm=frm_g, to=to_a, frm_code=frm, to_code=to) }}</p>
+        <a href="{{ search_url }}" class="btn">{{ t('route.search_cta', frm=frm_name, to=to_name) }}
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        </a>
+    </header>
+
+    <section class="route-fares">
+        <h2>{{ t('route.fares_title', frm=frm_name, to=to_name) }}</h2>
+        {% if flights %}
+        <div class="results-list">
+            {% for flight in flights %}
+            <article class="ticket {% if loop.first %}is-best{% endif %}" style="animation-delay: {{ loop.index0 * 0.04 }}s">
+                <div class="ticket-main">
+                    <div class="ticket-airline">
+                        <span class="av">{{ flight.airline[:2]|upper }}</span>
+                        <span class="nm">{{ flight.airline }}</span>
+                        {% if loop.first %}<span class="best-badge">{{ t('res.best') }}</span>{% endif %}
+                    </div>
+                    <div class="route-line">
+                        <div class="pt">
+                            <span class="city">{{ loc_city(flight.departure) }}</span>
+                            <span class="sub"><span class="iata">{{ flight.departure }}</span> · {{ t('res.departure') }}</span>
+                        </div>
+                        <div class="path"><svg class="plane" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L11 19v-5.5z"/></svg></div>
+                        <div class="pt right">
+                            <span class="city">{{ loc_city(flight.arrival) }}</span>
+                            <span class="sub"><span class="iata">{{ flight.arrival }}</span> · {{ t('res.arrival') }}</span>
+                        </div>
+                    </div>
+                    <div class="ticket-meta">
+                        <span class="m"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg> {{ flight.date }}</span>
+                        {% if flight.depart_time %}<span class="m"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> {{ flight.depart_time }}{% if flight.duration %}{% set h = flight.duration // 60 %}{% set mm = flight.duration % 60 %} · {% if h %}{{ h }}h {% endif %}{{ mm }}m{% endif %}</span>{% endif %}
+                        {% set tr = flight.transfers if flight.transfers is not none else 0 %}
+                        <span class="stops-chip {% if tr == 0 %}direct{% endif %}">{% if tr == 0 %}{{ t('res.direct') }}{% elif tr == 1 %}{{ t('res.stop_one') }}{% else %}{{ t('res.stops_n', n=tr) }}{% endif %}</span>
+                        {% if flight.context and not loop.first %}<span class="ctx-chip {{ flight.context }}">{{ t('res.ctx_' ~ flight.context) }}</span>{% endif %}
+                    </div>
+                </div>
+                <div class="ticket-stub">
+                    <span class="from">{{ t('res.from') }}</span>
+                    <span class="price">{{ "%.0f"|format(flight.price) }} <span class="cur">{{ flight.currency }}</span></span>
+                    <div class="deal"><a href="{{ flight.deeplink }}" target="_blank" rel="noopener noreferrer sponsored" class="btn deal-link">{{ t('res.view_deal') }}</a></div>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty"><p>{{ t('route.no_fares') }}</p><a href="{{ search_url }}" class="btn">{{ t('route.search_cta', frm=frm_name, to=to_name) }}</a></div>
+        {% endif %}
+    </section>
+
+    {% include 'partials/calendar.html' %}
+
+    {% if facts %}
+    <section class="route-good">
+        <h2>{{ t('route.facts_title') }}</h2>
+        <ul class="facts-list">
+            {% if facts.price_min %}<li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> {{ t('route.fact_price', min=facts.price_min, max=facts.price_max, cur=facts.currency) }}</li>{% endif %}
+            {% if facts.airlines %}<li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg> {{ t('route.fact_airlines', list=facts.airlines[:4]|join(', ')) }}</li>{% endif %}
+            <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> {% if facts.has_direct %}{{ t('route.fact_direct') }}{% else %}{{ t('route.fact_connecting') }}{% endif %}</li>
+            {% if facts.cheapest_date %}<li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg> {{ t('route.fact_cheapest', date=facts.cheapest_date) }}</li>{% endif %}
+        </ul>
+    </section>
+    {% endif %}
+
+    <div class="route-cols">
+        <section class="route-tips">
+            <h2>{{ t('route.tips_title', frm=frm_name, to=to_name) }}</h2>
+            <ul>
+                <li>{{ t('route.tip1') }}</li>
+                <li>{{ t('route.tip2') }}</li>
+                <li>{{ t('route.tip3') }}</li>
+            </ul>
+        </section>
+
+        <section class="route-faq">
+            <h2>{{ t('route.faq_title', frm=frm_g, to=to_a) }}</h2>
+            <details open><summary>{{ q1 }}</summary><p>{{ a1 }}</p></details>
+            <details><summary>{{ q2 }}</summary><p>{{ a2 }}</p></details>
+            <details><summary>{{ q3 }}</summary><p>{{ a3 }}</p></details>
+        </section>
+    </div>
+
+    <section class="route-related">
+        <div class="related-col">
+            <h3>{{ t('route.related_from', frm=frm_g) }}</h3>
+            <ul class="link-cloud">
+                {% for r in related_from %}<li><a href="{{ url_for('route_page', frm=frm, to=r.code) }}">{{ frm_name }} → {{ r.city }}</a></li>{% endfor %}
+            </ul>
+        </div>
+        <div class="related-col">
+            <h3>{{ t('route.related_to', to=to_a) }}</h3>
+            <ul class="link-cloud">
+                {% for r in related_to %}<li><a href="{{ url_for('route_page', frm=r.code, to=to) }}">{{ r.city }} → {{ to_name }}</a></li>{% endfor %}
+            </ul>
+        </div>
+    </section>
+</main>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {"@type": "Question", "name": {{ q1|tojson }}, "acceptedAnswer": {"@type": "Answer", "text": {{ a1|tojson }}}},
+    {"@type": "Question", "name": {{ q2|tojson }}, "acceptedAnswer": {"@type": "Answer", "text": {{ a2|tojson }}}},
+    {"@type": "Question", "name": {{ q3|tojson }}, "acceptedAnswer": {"@type": "Answer", "text": {{ a3|tojson }}}}
+  ]
+}
+</script>
+{% if flights %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "name": {{ ('Cheapest ' ~ frm_name ~ ' → ' ~ to_name ~ ' fares')|tojson }},
+  "itemListElement": [
+    {% for f in flights[:6] if f.price %}
+    {"@type": "ListItem", "position": {{ loop.index }}, "item": {
+      "@type": "Offer",
+      "name": {{ (frm_name ~ ' → ' ~ to_name ~ (' · ' ~ f.date if f.date else ''))|tojson }},
+      "category": "flight",
+      "price": {{ f.price|round|int }},
+      "priceCurrency": {{ f.currency|tojson }},
+      "url": {{ request.base_url|tojson }}
+    }}{{ "," if not loop.last }}
+    {% endfor %}
+  ]
+}
+</script>
+{% endif %}
+{% endblock %}

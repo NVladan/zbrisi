@@ -1,0 +1,27 @@
+{% if calendar %}
+<section class="price-cal">
+    <div class="cal-head">
+        <h2>{{ t('cal.title') }}</h2>
+        <p>{{ t('cal.sub') }}</p>
+    </div>
+    <div class="cal-card">
+        <div class="cal-month mono">{{ calendar.label }}</div>
+        <div class="cal-grid">
+            {% for wd in calendar.weekdays %}<span class="cal-wd">{{ wd }}</span>{% endfor %}
+            {% for week in calendar.weeks %}{% for c in week %}
+                {% if not c.in_month %}
+                    <span class="cal-day empty"></span>
+                {% elif c.deeplink and not c.past %}
+                    <a class="cal-day has-price {% if c.cheapest %}cheapest{% endif %}" href="{{ c.deeplink }}" target="_blank" rel="noopener noreferrer sponsored" title="{{ c.price }} {{ calendar.currency }}">
+                        <span class="cal-d-num">{{ c.day }}</span>
+                        <span class="cal-d-price">{{ c.price }}</span>
+                    </a>
+                {% else %}
+                    <span class="cal-day {% if c.past %}past{% endif %}"><span class="cal-d-num">{{ c.day }}</span></span>
+                {% endif %}
+            {% endfor %}{% endfor %}
+        </div>
+        <div class="cal-legend"><span class="cal-dot"></span> {{ t('res.cheapest') }} <b class="mono">{{ calendar.cheapest }} {{ calendar.currency }}</b></div>
+    </div>
+</section>
+{% endif %}

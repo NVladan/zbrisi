@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block meta_title %}{{ a.title }} · {{ brand }}{% endblock %}
+{% block meta_desc %}{{ a.description }}{% endblock %}
+
+{% block content %}
+<main class="wrap article-page">
+    <nav class="crumbs">
+        <a href="{{ url_for('index') }}">{{ t('common.home') }}</a> <span>/</span>
+        <a href="{{ url_for('guides_index') }}">{{ t('guides.h1') }}</a> <span>/</span>
+        <span>{{ a.title }}</span>
+    </nav>
+
+    <article class="article">
+        {% if a.date %}<p class="article-date mono">{{ a.date }}</p>{% endif %}
+        <div class="article-body">
+            {{ a.html|safe }}
+        </div>
+        <a href="{{ url_for('guides_index') }}" class="back-link">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7M19 12H5"/></svg>
+            {{ t('guides.back') }}
+        </a>
+    </article>
+</main>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": {{ a.title|tojson }},
+  "description": {{ a.description|tojson }},
+  "datePublished": {{ a.date|tojson }},
+  "dateModified": {{ a.date|tojson }},
+  "inLanguage": {{ a.lang|tojson }},
+  "publisher": {"@type": "Organization", "name": {{ brand|tojson }}},
+  "mainEntityOfPage": {{ request.base_url|tojson }}
+}
+</script>
+{% endblock %}

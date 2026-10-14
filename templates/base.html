@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="{{ lang }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% block robots %}{% endblock %}
+    {% if gsc %}<meta name="google-site-verification" content="{{ gsc }}">{% endif %}
+    <title>{% block meta_title %}{{ brand }}{% endblock %}</title>
+    <meta name="description" content="{% block meta_desc %}{{ t('hero.sub') }}{% endblock %}">
+    {% block canonical %}<link rel="canonical" href="{{ request.base_url }}">{% endblock %}
+    {% for code, url in hreflang_urls %}
+    <link rel="alternate" hreflang="{{ code }}" href="{{ url }}">
+    {% endfor %}
+    <link rel="alternate" hreflang="x-default" href="{{ alt_lang_url(default_lang) }}">
+
+    <!-- Open Graph / Twitter (social + messaging-app previews) -->
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="{{ brand }}">
+    <meta property="og:title" content="{{ self.meta_title() }}">
+    <meta property="og:description" content="{{ self.meta_desc() }}">
+    <meta property="og:url" content="{{ request.url }}">
+    <meta property="og:image" content="{{ url_for('static', filename='og-image.png', _external=True) }}">
+    <meta property="og:locale" content="{{ 'sr_RS' if lang == 'sr' else 'en_US' }}">
+    <meta property="og:locale:alternate" content="{{ 'en_US' if lang == 'sr' else 'sr_RS' }}">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ self.meta_title() }}">
+    <meta name="twitter:description" content="{{ self.meta_desc() }}">
+    <meta name="twitter:image" content="{{ url_for('static', filename='og-image.png', _external=True) }}">
+
+    <link rel="icon" href="{{ url_for('static', filename='img/favicon.ico') }}?v={{ asset_v }}" sizes="any">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='img/favicon-32.png') }}?v={{ asset_v }}">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='img/apple-touch-icon.png') }}?v={{ asset_v }}">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='fonts.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v={{ asset_v }}">
+    {% if analytics.plausible %}<script defer data-domain="{{ analytics.plausible }}" src="https://plausible.io/js/script.js"></script>{% endif %}
+    {% if tp_drive %}<!-- Travelpayouts Drive (affiliate monetisation) -->
+    <script>(function(){var s=document.createElement("script");s.async=1;s.src="{{ tp_drive }}";document.head.appendChild(s);})();</script>{% endif %}
+</head>
+<body data-ga="{{ analytics.ga }}" data-ac-url="{{ url_for('autocomplete') }}" data-geo-note="{{ t('geo.detected') }}">
+    <div class="grain" aria-hidden="true"></div>
+
+    <div class="loader" id="loader" aria-hidden="true">
+        <div class="runway"><span class="fly">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L11 19v-5.5z"/></svg>
+        </span></div>
+        <div class="lmsg">{{ t('loader.title') }}</div>
+        <div class="lsub">{{ t('loader.sub') }}</div>
+    </div>
+
+    <header class="site-header">
+        <a class="brand" href="{{ url_for('index') }}" aria-label="{{ brand }}.com">
+            <img class="brand-mark" src="{{ url_for('static', filename='img/logo-mark.png') }}?v={{ asset_v }}" width="30" height="30" alt="" loading="eager" decoding="async">
+            <span class="brand-name">{{ brand }}<span class="brand-tld">.com</span></span>
+        </a>
+        <nav class="site-nav">
+            <a href="{{ url_for('anywhere') }}">{{ t('nav.deals') }}</a>
+            <a href="{{ url_for('map_page') }}">{{ t('nav.map') }}</a>
+            <a href="{{ url_for('flights_hub') }}">{{ t('nav.flights') }}</a>
+            {% if has_guides %}<a href="{{ url_for('guides_index') }}">{{ t('nav.guides') }}</a>{% endif %}
+            <a href="{{ url_for('index') }}#explore">{{ t('nav.explore') }}</a>
+            <div class="lang-switch">
+                {% for code, label in languages.items() %}
+                <a href="{{ alt_lang_url(code) }}" hreflang="{{ code }}"
+                   class="{{ 'active' if code == lang else '' }}">{{ code|upper }}</a>
+                {% endfor %}
+            </div>
+            <a class="nav-cta" href="{{ url_for('index') }}#search">{{ t('nav.find') }}</a>
+        </nav>
+    </header>
+
+    {% block content %}{% endblock %}
+
+    <footer class="site-footer">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <a class="footer-logo" href="{{ url_for('index') }}" aria-label="{{ brand }}">
+                    <img class="brand-mark" src="{{ url_for('static', filename='img/logo-mark.png') }}?v={{ asset_v }}" width="26" height="26" alt="" loading="lazy" decoding="async">
+                    <span class="brand-name">{{ brand }}</span>
+                </a>
+                <p class="footer-tagline">{{ t('footer.tagline') }}</p>
+            </div>
+
+            <nav class="footer-col">
+                <span class="footer-label">{{ t('footer.col_browse') }}</span>
+                <a href="{{ url_for('anywhere') }}">{{ t('nav.deals') }}</a>
+                <a href="{{ url_for('map_page') }}">{{ t('nav.map') }}</a>
+                <a href="{{ url_for('flights_hub') }}">{{ t('footer.flights') }}</a>
+                {% if has_guides %}<a href="{{ url_for('guides_index') }}">{{ t('nav.guides') }}</a>{% endif %}
+                <a href="{{ url_for('index') }}#explore">{{ t('nav.explore') }}</a>
+            </nav>
+
+            <nav class="footer-col">
+                <span class="footer-label">{{ t('footer.col_legal') }}</span>
+                <a href="{{ url_for('privacy') }}">{{ t('footer.privacy') }}</a>
+                <a href="{{ url_for('terms') }}">{{ t('footer.terms') }}</a>
+                <a href="{{ url_for('imprint') }}">{{ t('footer.imprint') }}</a>
+            </nav>
+
+            <div class="footer-col">
+                <span class="footer-label">{{ t('footer.contact') }}</span>
+                <a class="footer-email" href="mailto:{{ contact_email }}">{{ contact_email }}</a>
+            </div>
+        </div>
+
+        <div class="footer-fine">
+            <p class="footer-disclosure">{{ t('footer.disclosure') }}</p>
+        </div>
+
+        <div class="footer-base">
+            <span>© 2026 {{ brand }}</span>
+            <span>{{ t('footer.powered') }}</span>
+        </div>
+    </footer>
+
+    {% if analytics.ga %}
+    <div class="cookie-banner" id="cookieBanner" role="dialog" aria-live="polite">
+        <p>{{ t('cookie.msg') }} <a href="{{ url_for('privacy') }}">{{ t('cookie.more') }}</a></p>
+        <div class="cookie-actions">
+            <button type="button" class="btn btn-ghost cookie-btn" id="cookieDecline">{{ t('cookie.decline') }}</button>
+            <button type="button" class="btn cookie-btn" id="cookieAccept">{{ t('cookie.accept') }}</button>
+        </div>
+    </div>
+    {% endif %}
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "{{ brand }}",
+      "url": "{{ url_for('index', _external=True) }}",
+      "inLanguage": "{{ lang }}",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": "{{ url_for('search', _external=True) }}?departure_location={search_term_string}"
+        },
+        "query-input": "required name=search_term_string"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "{{ brand }}",
+        "url": "{{ url_for('index', _external=True) }}",
+        "logo": "{{ url_for('static', filename='og-image.png', _external=True) }}"{% if social_links %},
+        "sameAs": {{ social_links|tojson }}{% endif %}
+      }
+    }
+    </script>
+
+    <script src="{{ url_for('static', filename='app.js') }}?v={{ asset_v }}" defer></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>
